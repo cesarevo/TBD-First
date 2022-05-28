@@ -572,7 +572,7 @@ SELECT * FROM updatable;
 
 ### Нужно добавить ещё 1 строчку
 ```SQL
-HAVINGmax(score)>3.6
+HAVING max(score)>3.6
 ```
 ### И тогда улетят Pashka, Pushka and Pivo(имена на букву P)
 ### Я просто тестил всякое тут
