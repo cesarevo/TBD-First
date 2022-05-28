@@ -73,9 +73,216 @@ INNER JOIN hobby h ON h.id = sh.id
 ![sql1](https://github.com/cesarevo/TBD-First/blob/08caf77588af0a4d967b873ff7ce90cfb03d9dcc/sql1.png)
 
 <br></br>
+
+
+
+<br></br>
+
+### <a name="3_2"></a> 2. Вывести информацию о студенте, занимающимся хобби самое продолжительное время.
+
+#### `Запрос`
+
+```SQL
+SELECT (NOW ()-sh.started_at) as doing, *
+FROM student stud
+INNER JOIN student_hobby sh ON stud.n_z  = sh.student_id
+INNER JOIN hobby h ON h.id = sh.hobby_id
+WHERE sh.finished_at IS NULL
+ORDER BY sh.started_at
+LIMIT 1
+
+```
+
+#### `Вывод`
+
 ![sql2](sql_pict/sql2.png)
 
+<br></br>
 
+### <a name="3_3"></a> 3. Вывести имя, фамилию, номер зачетки и дату рождения для студентов, средний балл которых выше среднего, а сумма риска всех хобби, которыми он занимается в данный момент, больше 9.
+
+#### `Запрос`
+
+```SQL
+SELECT stud.name, stud.surname, stud.n_z, stud.age
+FROM student stud LEFT JOIN (
+SELECT student_id, SUM(risk) FROM student_hobby sh
+JOIN hobby h on sh.hobby_id = h.id
+GROUP BY student_id) as nt 
+ON stud.id=nt.student_id
+WHERE stud.score>= (select AVG(score) FROM student) and nt.sum>9
+```
+
+#### `Вывод`
+
+![sql3](sql_pict/sql3.png)
+
+<br></br>
+
+### <a name="3_4"></a> 4. Вывести фамилию, имя, зачетку, дату рождения, название хобби и длительность в месяцах, для всех завершенных хобби Диапазон дат.
+
+#### `Запрос`
+
+```SQL
+SELECT stud.surname, stud.name, stud.n_z, stud.age  FROM student stud;
+SELECT h.hobby_name FROM hobby h;
+
+SELECT (sh.finished_at - sh.started_at)/30 as doing
+FROM student stud
+INNER JOIN student_hobby sh ON stud.n_z = sh.student_id
+INNER JOIN hobby h ON h.id = sh.hobby_id
+```
+
+#### `Вывод`
+
+![sql4](sql_pict/sql4.png)
+
+<br></br>
+
+### <a name="3_5"></a> 5. Вывести фамилию, имя, зачетку, дату рождения студентов, которым исполнилось N полных лет на текущую дату, и которые имеют более 1 действующего хобби.
+
+#### `Запрос`
+
+```SQL
+SELECT stud.surname, stud.name, stud.n_z, stud.age
+FROM student stud 
+Inner JOIN (
+SELECT student_id, (count(sh.started_at)-count(sh.finished_at)) as counter
+FROM student_hobby sh
+JOIN hobby h on sh.hobby_id = h.id
+GROUP BY student_id) as nt 
+ON stud.n_z=nt.student_id
+WHERE stud.age>19 and nt.counter>1
+
+```
+
+#### `Вывод`
+
+![sql5](sql_pict/sql5.png)
+
+<br></br>
+
+### <a name="3_6"></a> 6. Найти средний балл в каждой группе, учитывая только баллы студентов, которые имеют хотя бы одно действующее хобби.
+
+#### `Запрос`
+
+```SQL
+SELECT stud.n_group, AVG(stud.score)
+FROM student stud
+INNER JOIN student_hobby sh on stud.n_z=sh.student_id
+WHERE sh.finished_at IS NULL and sh.started_at IS NOT NULL
+GROUP BY stud.n_group
+
+```
+
+#### `Вывод`
+
+![sql6](sql_pict/sql6.png)
+
+<br></br>
+
+### <a name="3_7"></a> 7. Найти название, риск, длительность в месяцах самого продолжительного хобби из действующих, указав номер зачетки студента.
+
+#### `Запрос`
+
+```SQL
+SELECT h.hobby_name as hobby, h.risk, 12*extract( days from (NOW ()-sh.started_at)) as doing, stud.n_z
+FROM student stud
+INNER JOIN student_hobby sh ON stud.n_z = sh.student_id
+INNER JOIN hobby h ON h.id = sh.hobby_id
+WHERE sh.finished_at IS NULL and stud.n_z=1
+ORDER BY sh.started_at
+```
+### у меня выдало 2 строки, но можно  можно прописать Limit 1 в конце
+#### `Вывод`
+
+![sql7](sql_pict/sql7.png)
+
+<br></br>
+
+### <a name="3_8"></a> 8. Найти все хобби, которыми увлекаются студенты, имеющие максимальный балл.
+
+#### `Запрос`
+
+```SQL
+SELECT 	h.hobby_name, max(stud.score) max_score
+FROM 	student stud, hobby h, student_hobby sh
+WHERE 	h.id= sh.hobby_id and 
+      	stud.n_z= sh.student_id
+GROUP BY h.hobby_name
+```
+### у меня мой запрос как-то криво работал
+### поэтому я пока редактировал readme посмотрел как саня сделал
+### но изменил под свои реали и всё нормально заработало
+#### `Вывод`
+
+![sql8](sql_pict/sql8.png)
+
+<br></br>
+
+### <a name="3_9"></a> 9. Найти все действующие хобби, которыми увлекаются троечники 2-го курса.
+
+#### `Запрос`
+
+### В теории должно работать
+### но у меня просто нет троечников на 2 курсе
+### Вывод: второкурсники-умные
+
+```SQL
+Ну вот что получилось просто у второкурсников
+SELECT h.hobby_name as hobby
+FROM hobby h
+INNER JOIN
+student_hobby sh on h.id = sh.hobby_id
+INNER JOIN (SELECT stud.n_z
+FROM student stud
+WHERE stud.score=3 and n_group/1000=2)  stud on stud.n_z=sh.student_id
+WHERE sh.finished_at IS NULL
+
+```
+### Ну вот что получилось просто у второкурсников
+'''SQL
+SELECT h.hobby_name as hobby
+FROM hobby h
+INNER JOIN
+student_hobby sh on h.id = sh.hobby_id
+INNER JOIN (SELECT stud.n_z
+FROM student stud
+WHERE stud.score<6 and n_group/1000=2)  stud on stud.n_z=sh.student_id
+WHERE sh.finished_at IS NULL
+'''
+#### `Вывод`
+
+![sql9](sql_pict/sql9.png)
+
+<br></br>
+
+### <a name="3_10"></a> 10. Найти номера курсов, на которых более 50% студентов имеют более одного действующего хобби.
+
+### Взял у Паши, но он мне на паре объяснил что да как
+### По итогу я забыл  как всё это работает
+#### `Запрос`
+```SQL
+SELECT course_act.course
+FROM
+(SELECT course, COUNT(DISTINCT sh.student_id )as zanim
+FROM student_hobby sh
+INNER JOIN (
+SELECT DISTINCT n_group/1000 as course, st.n_z
+FROM student st) as nt on nt.n_z = sh.student_id
+WHERE finished_at IS NULL
+GROUP BY course) as course_act
+RIGHT JOIN
+(SELECT n_group/1000 as course, COUNT(*) from student st GROUP BY n_group/1000) as course_all 
+on course_act.course = course_all.course
+WHERE course_act.zanim*1./course_all.count>0.5
+```
+
+#### `Вывод`
+
+![sql10](sql_pict/sql10.png)
+
+<br></br>
 
 
 
