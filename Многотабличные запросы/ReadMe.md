@@ -476,3 +476,217 @@ ORDER BY sh.started_at limit 5 ) as groupsss
 <br></br>
 
 
+### <a name="3_21"></a> 21. Создать представление, которое выводит номер зачетки, имя и фамилию студентов, отсортированных по убыванию среднего балла.
+
+#### `Запрос`
+
+```SQL
+select st.id, st.n_group, st.name, st.surname, st.score
+from students st
+order by st.score desc
+```
+
+#### `Вывод`
+
+![exesize3_21](image/exe3_21.png)
+
+<br></br>
+
+### <a name="3_22"></a> 22. Представление: найти каждое популярное хобби на каждом курсе.
+
+#### `Запрос`
+
+```SQL
+CREATE OR REPLACE VIEW h_mostpopular AS
+
+select DISTINCT ON (1) left(st.n_group::varchar, 1) n_cours, hb.id
+
+from students st
+INNER JOIN students_hobbies st_hb
+ON st.id = st_hb.student_id
+INNER JOIN hobby hb
+ON st_hb.hobby_id = hb.id
+
+group by st.n_group, hb.id
+order by n_cours, hb.id;
+
+SELECT * FROM public.h_mostpopular
+```
+
+#### `Вывод`
+
+![exesize3_22](image/exe3_22.png)
+
+<br></br>
+
+### <a name="3_23"></a> 23. Представление: найти хобби с максимальным риском среди самых распространенных хобби на 2 уровне.
+
+#### `Запрос`
+
+```SQL
+CREATE OR REPLACE VIEW h_mostrisk_2grade AS
+SELECT *
+FROM hobby hb
+WHERE hb.id
+IN
+  (SELECT hb.id
+  FROM students st
+  INNER JOIN students_hobbies st_hb
+  ON st.id = st_hb.student_id
+  INNER JOIN hobby hb
+  ON st_hb.hobby_id = hb.id
+  WHERE LEFT(st.id::VARCHAR,1) = '2'
+  GROUP BY hb.id
+  ORDER BY COUNT(hb.id))
+ORDER BY hb.risk DESC
+LIMIT 1;
+
+SELECT * FROM public.h_mostrisk_2grade
+```
+
+#### `Вывод`
+
+![exesize3_23](image/exe3_23.png)
+
+<br></br>
+
+### <a name="3_24"></a> 24. Представление: для каждого курса подбирается количество студентов на курсе и количество отличников.
+
+#### `Запрос`
+
+```SQL
+CREATE OR REPLACE VIEW st_idealscore_bygrade AS
+SELECT 
+  LEFT(st.n_group::VARCHAR,1) kours, 
+  COUNT(st.id) total, 
+  COUNT(st.id) FILTER (WHERE st.score >= 4.5) goodcount
+FROM students st
+GROUP BY LEFT(st.n_group::VARCHAR,1);
+
+SELECT * FROM public.st_idealscore_bygrade
+```
+
+#### `Вывод`
+
+![exesize3_24](image/exe3_24.png)
+
+<br></br>
+
+### <a name="3_25"></a> 25. Представление: самое популярное хобби среди всех студентов.
+
+#### `Запрос`
+
+```SQL
+CREATE OR REPLACE VIEW h_popular AS
+SELECT *
+FROM hobby hb
+WHERE 
+  hb.id = 
+    (SELECT hb.id
+    FROM students st
+    INNER JOIN students_hobbies st_hb
+    ON st.id = st_hb.student_id
+    INNER JOIN hobby hb
+    ON st_hb.hobby_id = hb.id
+    GROUP BY hb.id
+    ORDER BY COUNT(hb.id) DESC
+    LIMIT 1);
+	
+SELECT * FROM public.h_popular
+```
+
+#### `Вывод`
+
+![exesize3_25](image/exe3_25.png)
+
+<br></br>
+
+### <a name="3_26"></a> 26. Создать обновляемое представление.
+
+#### `Запрос`
+
+```SQL
+CREATE OR REPLACE VIEW students_short AS
+SELECT st.id, st.name, st.surname, st.n_group
+FROM students st;
+SELECT * FROM public.students_short
+```
+
+#### `Вывод`
+
+![exesize3_26](image/exe3_26.png)
+
+<br></br>
+
+### <a name="3_27"></a> 27. Для каждой буквы алфавита из числа найденных величин, средних и балльных. (Т.е. среди всех студентов, чьё имя начинается на А (Алексей, Алина, Артур, Анджела) найти то, что указано в задании. Вывести на экран тех, средний балл проходит больше 3,6
+
+#### `Запрос`
+
+```SQL
+SELECT LEFT(st.name::VARCHAR,1) kours, MIN(st.score), MAX(st.score), ROUND(AVG(st.score),2) sred
+FROM students st
+GROUP BY LEFT(st.name::VARCHAR,1)
+HAVING MAX(st.score) > 3.6
+```
+
+#### `Вывод`
+
+![exesize3_27](image/exe3_27.png)
+
+<br></br>
+
+### <a name="3_28"></a> 28. Для каждой фамилии характерна высокая степень тяжести и снижение балла. (Например, в университете учатся 4 Иванова (1-2-3-4). 1-2-3 учатся на 2 курсах и имеют средний балл 4.1, 4, 3.8, соответственно, а 4 Иванов учится на 3 курсах и имеет балл 4.5. На экране должно быть следующее:
+курс | фамилия | max | min
+-----|---------|-----|-----
+2    | Иванов  | 4,1 | 3,8
+3    | Иванов  | 4,5 | 4,5
+
+#### `Запрос`
+
+```SQL
+SELECT 
+  LEFT(st.n_group::VARCHAR,1) kours, 
+  st.surname,
+  MIN(st.score),
+  MAX(st.score)
+FROM students st
+GROUP BY
+  LEFT(st.n_group::VARCHAR,1),
+  st.surname
+```
+
+#### `Вывод`
+
+![exesize3_28](image/exe3_28.png)
+
+<br></br>
+
+### <a name="3_29"></a> 29. Для каждого года рождения подсчитывается количество хобби, наблюдаемое или занимавшееся студентами.
+
+#### `Запрос`
+
+```SQL
+SELECT EXTRACT(YEAR FROM st.date_birth) birth, COUNT(*) col_hobby
+FROM students st
+INNER JOIN students_hobbies st_hb
+ON st.id = st_hb.student_id
+GROUP BY EXTRACT(YEAR FROM st.date_birth)
+```
+
+#### `Вывод`
+
+![exesize3_29](image/exe3_29.png)
+
+<br></br>
+
+### <a name="3_30"></a> 30. Для каждой буквы алфавита в большинстве случаев возникает риск, связанный с хобби.
+
+#### `Запрос`
+
+```SQL
+--непонял задание
+```
+
+#### `Вывод`
+
+<br></br>
