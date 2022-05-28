@@ -337,9 +337,9 @@ ORDER BY course, stud.age DESC
 
 #### `Вывод`
 
-![sql13]sql_pict/sql13.png)
+![sql13](sql_pict/sql13.png)
 
-``` ну не оказалось таких, ну бывает
+### ну не оказалось таких, ну бывает
 <br></br>
 
 ### <a name="3_14"></a> 14. Создать представление, в котором отображается вся информация о студентах, которые продолжают заниматься хобби в данный момент и занимаются им как минимум 5 лет.
@@ -356,7 +356,7 @@ WHERE finished_at is null and  extract(year from (clock_timestamp ( )-sh.started
 
 #### `Вывод`
 
-![sql14](sql_pict/sql14.png)
+![sql14](sql_pict/sql14_1.png)
 
 ### никого у меня нет, кто дольше 5 лет занимается
 ### Вот вывод без условий
@@ -420,7 +420,7 @@ WHERE finished_at is null) as stid on stud.n_z = stid.student_id
 
 ![sql17](sql_pict/sql17.png)
 
-``` И ещё колонка со student_id=6
+### И ещё колонка со student_id=6
 <br></br>
 
 ### <a name="3_18"></a> 18. Вывести ИД 3х хобби с максимальным риском.
