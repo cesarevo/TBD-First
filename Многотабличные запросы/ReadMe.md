@@ -634,3 +634,239 @@ GROUP BY left(stud_tabl.name,1)
 ![sql30](sql_pict/sql30.png)
 
 <br></br>
+
+
+### <a name="3_31"></a> 31. Для каждого месяца из-за даты рождения студентов получаются средние баллы, которые являются хобби под названием «Футбол».
+
+### Предисловие
+###### Тут Паша сказал создать колонку с годом рождения, ну я послушался и создал
+
+###### через вот такие запросики(если задавать с ограничением на NULL, то от будет выдавать ошибку)
+###### поэтому создал пока без ограничения(все значения стали null)
+###### а потом заполнил их в ручну(2022 - age и рандомные месяца с днями)
+
+```SQL
+ALTER TABLE student
+ADD date_of_birth DATE;
+
+```
+###### Потом добавил ограничения
+```SQL
+ALTER TABLE student 
+ALTER COLUMN date_of_birth 
+SET NOT NULL;
+```
+###### я только потом увидел, что можно добавлять колонку сразу с ограничением
+###### просто изначальные значения поставить не заполнено или тип того
+###### ну да и ладно
+### Итог:
+![sql31_1](sql_pict/sql31_1)
+
+#### `Запрос`
+
+```SQL
+SELECT extract(month from date_of_birth) as month, avg(score)
+FROM (student stud right join student_hobby sh on sh.student_id=stud.n_z) as month_table left join hobby h on h.id=month_table.hobby_id
+WHERE finished_at is null and h.hobby_name='dance' 
+GROUP BY month
+```
+
+#### `Вывод`
+
+![sql31_2](sql_pict/sql31_2.png)
+
+### футбола у меня нет, поэтому вывел dance
+
+<br></br>
+
+### <a name="3_32"></a> 32. Вывести информацию о студентах, которые занимались или занимались хотя бы 1 хобби в следующем формате: Имя: Иван, фамилия: Иванов, группа: 1234
+#### `Запрос`
+
+```SQL
+SELECT distinct 'Имя: '||stud.name||', фамилия: '||stud.surname||', группа: '||stud.n_group 
+
+FROM student stud RIGHT JOIN student_hobby sh on stud.n_z=sh.student_id
+```
+
+#### `Вывод`
+
+![sql32](sql_pict/sql32.png)
+
+<br></br>
+
+### <a name="3_33"></a> 33. Внешний вид в какой-то по счёту символа встречается «ов». Если 0 (т.е. не встречается, то выведите на экран «не найдено»).
+#### `Запрос`
+
+```SQL
+SELECT case position('ов' in surname)::varchar
+when '0' then 'не найдено'
+else position('ов' in surname)::varchar end
+FROM student
+```
+
+#### `Вывод`
+
+![sql33](sql_pict/sql33.png)
+
+<br></br>
+
+### <a name="3_34"></a> 34. Дополнить фамилию прямым символом # до 10 символов.
+
+#### `Запрос`
+
+```SQL
+SELECT case 
+when (length(surname)>10) then surname
+else rpad(surname,10,'#') end
+FROM student
+
+```
+
+#### `Вывод`
+
+![sql34](sql_pict/sql34.png)
+
+<br></br>
+
+### <a name="3_35"></a> 35. При помощи функции удалить все символы # из полученного запроса.
+
+#### `Запрос`
+
+```SQL
+SELECT rtrim(surname,'#')
+FROM( SELECT case 
+when (length(surname)>10) then surname
+else rpad(surname,10,'#')
+end as surname
+FROM student) as norm_tabl
+
+```
+
+#### `Вывод`
+
+![sql35](sql_pict/sql35.png)
+
+<br></br>
+
+### <a name="3_36"></a> 36. Выведите на экран количество дней в прошлом 2018 году.
+
+#### `Запрос`
+
+```SQL
+SELECT extract(days FROM date_trunc('month', '4-1-2018'::date) + interval '1 month - 1 day');
+```
+
+#### `Вывод`
+
+![sql36](sql_pict/sql36.png)
+
+### Посмотрел, с февралём тоже работает
+
+```SQL
+SELECT extract(days FROM date_trunc('month', '2-1-2020'::date) + interval '1 month - 1 day');
+```
+#### `Вывод`
+
+![sql36_2](sql_pict/sql36_2.png)
+
+```SQL
+SELECT extract(days FROM date_trunc('month', '2-1-2018'::date) + interval '1 month - 1 day');
+```
+#### `Вывод`
+
+![sql36_3](sql_pict/sql36_3.png)
+
+<br></br>
+
+### <a name="3_37"></a> 37. Вывести на экран какого числа будет ближайшая суббота.
+
+### Нашёл 2 способа на stackoverflow пришлось их чуток переделать
+
+#### `Запрос`
+
+```SQL
+SELECT current_date + cast(abs(extract(dow FROM current_date) - 7) - 1 AS int);
+
+SELECT current_date+7 - (( cast(extract(dow FROM current_date) AS int)+1) %8)
+
+```
+
+#### `Вывод`
+
+![sql37](sql_pict/sql37.png)
+
+<br></br>
+
+### <a name="3_38"></a> 38. Выведите на экран век, а также какая сейчас неделя года и день года.
+
+#### `Запрос`
+
+```SQL
+Select
+extract(century from current_date) as century,
+extract(weeks from current_date) as weeknumber,
+extract(days from current_date) as daynumber; 
+```
+
+#### `Вывод`
+
+![sql38](sql_pict/sql38.png)
+
+<br></br>
+
+### <a name="3_39"></a> 39. Вы вводите всех студентов, которые занимались хотя бы 1 хобби. Выведите на экран Имя, Фамилию, Название хобби, а также надпись «занимается», если студент продолжает заниматься хобби в данный момент или «закончил», если уже не занимается.
+
+#### `Запрос`
+
+```SQL
+SELECT stud.name, stud.surname, h.hobby_name,
+case
+when (sh.finished_at is null) then 'Закончил'
+else 'Занимается' end
+
+FROM student stud RIGHT JOIN student_hobby sh on stud.n_z=sh.student_id LEFT JOIN hobby h on h.id = sh.hobby_id
+
+```
+
+#### `Вывод`
+
+![sql39](sql_pict/sql39.png)
+
+######наконец-то нормальные запросы, а то прошлые с датами мне не понравились
+
+<br></br>
+
+### <a name="3_40"></a> 40. Для каждой группы приводят количество студентов учится на 5,4,3,2. Использовать обычное математическое округление. Итоговый результат должен выглядеть примерно так:
+
+
+СЧЕТ  | 2222 | 3011 | 4011 | 4032 
+----- | ---- | ---- | ---- | ---- 
+2     | 0    | 0    | 0    | 1 
+3     | 1    | 2    | 1    | 1 
+4     | 4    | 3    | 3    | 3 
+5     | 1    | 1    | 1    | 0 
+
+#### `Запрос`
+
+```SQL
+SELECT n_group,
+count(case round(score) when 2 then 1 end) as "2",
+count(case round(score) when 3 then 1 end) as "3",
+count(case round(score) when 4 then 1 end) as "4",
+count(case round(score) when 5 then 1 end) as "5"
+FROM student
+GROUP BY n_group
+
+```
+
+#### `Вывод`
+
+![sql40](sql_pict/sql40.png)
+
+<br></br>
+
+
+# ИТОГ:
+
+### В целом то, что было непонятно я спросил у Паши с Костей, а так нужно всё на практике фигачить
+
