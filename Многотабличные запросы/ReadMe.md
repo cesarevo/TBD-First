@@ -73,7 +73,7 @@ INNER JOIN hobby h ON h.id = sh.id
 ![sql1](https://github.com/cesarevo/TBD-First/blob/08caf77588af0a4d967b873ff7ce90cfb03d9dcc/sql1.png)
 
 <br></br>
-![sql2](sql_pictures/sql2.png)
+![sql2](sql_pict/sql2.png)
 
 
 
