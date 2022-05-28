@@ -241,7 +241,7 @@ WHERE sh.finished_at IS NULL
 
 ```
 ### Ну вот что получилось просто у второкурсников
-'''SQL
+```SQL
 SELECT h.hobby_name as hobby
 FROM hobby h
 INNER JOIN
@@ -250,7 +250,7 @@ INNER JOIN (SELECT stud.n_z
 FROM student stud
 WHERE stud.score<6 and n_group/1000=2)  stud on stud.n_z=sh.student_id
 WHERE sh.finished_at IS NULL
-'''
+```
 #### `Вывод`
 
 ![sql9](sql_pict/sql9.png)
@@ -285,5 +285,194 @@ WHERE course_act.zanim*1./course_all.count>0.5
 <br></br>
 
 
+### <a name="3_11"></a> 11. Вывести номера групп, в которых не менее 60% студентов имеют балл не ниже 4.
+
+#### `Запрос`
+
+```SQL
+SELECT n_group FROM student
+GROUP BY n_group
+HAVING COUNT(CASE
+    WHEN score>=4 THEN 1
+    ELSE NULL END)/COUNT(*)>=0.6
+
+```
+
+#### `Вывод`
+
+![sql11](sql_pict/sql11.png)
+
+<br></br>
+
+### <a name="3_12"></a> 12.  Для каждого курса подсчитать количество различных действующих хобби на курсе.
+
+#### `Запрос`
+
+```SQL
+SELECT n_group/1000 as course, COUNT(DISTINCT h.hobby_name)
+FROM student as stud
+RIGHT JOIN student_hobby as sh on sh.student_id=stud.n_z
+Left JOIN hobby as h on h.id=sh.hobby_id
+GROUP BY n_group/1000
+```
+
+#### `Вывод`
+
+![sql12](sql_pict/sql12.png)
+
+<br></br>
+
+### <a name="3_13"></a>  13. Вывести номер зачётки, фамилию и имя, дату рождения и номер курса для всех отличников, не имеющих хобби. Отсортировать данные по возрастанию в пределах курса по убыванию даты рождения.
+
+#### `Запрос`
+
+```SQL
+SELECT stud.n_z, stud.surname, stud.name, stud.age, n_group/1000 as course
+FROM student as stud
+LEFT JOIN student_hobby as sh on sh.student_id=stud.n_z
+Left JOIN hobby as h on h.id=sh.hobby_id
+WHERE sh.hobby_id is NULL and score=5
+ORDER BY course, stud.age DESC
+```
+
+#### `Вывод`
+
+![sql13]sql_pict/sql13.png)
+
+``` ну не оказалось таких, ну бывает
+<br></br>
+
+### <a name="3_14"></a> 14. Создать представление, в котором отображается вся информация о студентах, которые продолжают заниматься хобби в данный момент и занимаются им как минимум 5 лет.
+
+#### `Запрос`
+
+```SQL
+CREATE OR REPLACE VIEW full_info AS
+SELECT distinct stud.n_z, stud.name, stud.surname,stud.adress,stud.score,stud.n_group,stud.age
+FROM student stud 
+RIGHT JOIN student_hobby sh on stud.n_z=sh.student_id
+WHERE finished_at is null and  extract(year from (clock_timestamp ( )-sh.started_at))>5
+```
+
+#### `Вывод`
+
+![sql14](sql_pict/sql14.png)
+
+### никого у меня нет, кто дольше 5 лет занимается
+### Вот вывод без условий
+
+![sql14_2](sql_pict/sql14_2.png)
+
+<br></br>
+
+### <a name="3_15"></a> 15. Для каждого хобби вывести количество людей, которые им занимаются.
+
+#### `Запрос`
+
+```SQL
+SELECT h.hobby_name, COUNT((sh.student_id, sh.hobby_id)) as count 
+FROM hobby h LEFT JOIN student_hobby sh on h.id=sh.hobby_id
+WHERE sh.finished_at is null
+GROUP BY h.hobby_name
+```
+
+#### `Вывод`
+
+![sql15](sql_pict/sql15.png)
+
+### У меня всего 5 null у finished_at, поэтому всё ок
+<br></br>
+
+### <a name="3_16"></a> 16. Вывести ИД самого популярного хобби.
+
+#### `Запрос`
+
+```SQL
+SELECT id FROM(
+SELECT h.id, COUNT((sh.student_id, sh.hobby_id))
+FROM hobby h LEFT JOIN student_hobby sh on h.id=sh.hobby_id
+WHERE sh.finished_at is null
+GROUP BY h.id 
+ORDER BY count desc limit 1) as popular_hobby
+```
+
+#### `Вывод`
+
+![sql16](sql_pict/sql16.png)
+
+<br></br>
+
+### <a name="3_17"></a> 17. Вывести всю информацию о студентах, занимающихся самым популярным хобби.
+
+#### `Запрос`
+
+```SQL
+SELECT * FROM student stud RIGHT JOIN (
+Select student_id from student_hobby sh
+RIGHT JOIN( SELECT h.id  FROM hobby h LEFT JOIN student_hobby sh on h.id=sh.hobby_id
+WHERE sh.finished_at is null
+GROUP BY h.id
+ORDER BY COUNT(distinct (sh.student_id, sh.hobby_id)) desc limit 1) as besth on besth.id=sh.hobby_id
+WHERE finished_at is null) as stid on stud.n_z = stid.student_id
+```
+
+#### `Вывод`
+
+![sql17](sql_pict/sql17.png)
+
+``` И ещё колонка со student_id=6
+<br></br>
+
+### <a name="3_18"></a> 18. Вывести ИД 3х хобби с максимальным риском.
+
+#### `Запрос`
+
+```SQL
+SELECT id FROM hobby
+ORDER BY risk desc limit 3
+```
+
+#### `Вывод`
+
+![sql18](sql_pict/sql18.png)
+
+### Мне страшно, что такой маленький запрос вышел
+<br></br>
+
+### <a name="3_19"></a> 19. Вывести 10 студентов, которые занимаются одним (или несколькими) хобби самое продолжительно время.
+
+#### `Запрос`
+
+```SQL
+SELECT distinct stud.n_z, stud.name, stud.surname,stud.n_group sh.started_at FROM
+student stud RIGHT JOIN student_hobby sh on stud.n_z=sh.student_id
+WHERE sh.finished_at is null
+ORDER BY sh.started_at limit 5
+```
+
+#### `Вывод`
+
+![sql19](sql_pict/sql19.png)
+
+### О, там даже я есть(самый первый)    
+<br></br>
+
+### <a name="3_20"></a> 20. Вывести номера групп (без повторений), в которых учатся студенты из предыдущего запроса.
+
+#### `Запрос`
+
+```SQL
+SELECT distinct n_group from
+(SELECT distinct stud.n_z, stud.name, stud.surname,stud.n_group, sh.started_at FROM
+student stud RIGHT JOIN student_hobby sh on stud.n_z=sh.student_id
+WHERE sh.finished_at is null
+ORDER BY sh.started_at limit 5 ) as groupsss
+```
+
+#### `Вывод`
+
+![sql20](sql_pict/sql20.png)
+
+<br></br>
 
 
