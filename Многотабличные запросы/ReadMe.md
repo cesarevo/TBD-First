@@ -35,7 +35,7 @@ id | surname | max | min
 3  | Иванов  | 4,5 | 4,5
 
 29. [Для каждого года рождения подсчитывается количество хобби, наблюдаемое или занимавшееся студентами.](#3_29)
-30. [Для каждой буквы алфавита в большинстве случаев возникает риск, связанный с хобби.](#3_30)
+30. [Для каждой буквы алфавита в имени найти максимальный и минимальный риск хобби.](#3_30)
 31. [Для каждого месяца из-за даты рождения студентов получаются средние баллы, которые являются хобби под названием «Футбол».](#3_31)
 32. [Вывести информацию о студентах, которые занимались или занимались хотя бы 1 хобби в следующем формате: Имя: Иван, фамилия: Иванов, группа: 1234](#3_32)
 33. [Внешний вид в какой-то по счёту символа встречается «ов». Если 0 (т.е. не встречается, то выведите на экран «не найдено»).](#3_33)
@@ -481,15 +481,26 @@ ORDER BY sh.started_at limit 5 ) as groupsss
 #### `Запрос`
 
 ```SQL
-select st.id, st.n_group, st.name, st.surname, st.score
-from students st
-order by st.score desc
+CREATE OR REPLACE VIEW not_full_info AS
+SELECT n_z, name, surname
+FROM student
+ORDER BY score desc
+
 ```
 
-#### `Вывод`
+#### `Создал`
 
-![exesize3_21](image/exe3_21.png)
+![sql21](sqp_pict/sql21_1.png)
 
+### Тут я выведу инфу из представления
+
+```SQL
+SELECT * FROM not_full_info;
+```
+
+### `Вывод`
+
+![sql21_2](sql_pict/sql21_3.png)
 <br></br>
 
 ### <a name="3_22"></a> 22. Представление: найти каждое популярное хобби на каждом курсе.
@@ -497,25 +508,9 @@ order by st.score desc
 #### `Запрос`
 
 ```SQL
-CREATE OR REPLACE VIEW h_mostpopular AS
-
-select DISTINCT ON (1) left(st.n_group::varchar, 1) n_cours, hb.id
-
-from students st
-INNER JOIN students_hobbies st_hb
-ON st.id = st_hb.student_id
-INNER JOIN hobby hb
-ON st_hb.hobby_id = hb.id
-
-group by st.n_group, hb.id
-order by n_cours, hb.id;
-
-SELECT * FROM public.h_mostpopular
+тут должен быть запрос, но я не понял как это сделать
+Что-то пробовал, но ничего не получилось
 ```
-
-#### `Вывод`
-
-![exesize3_22](image/exe3_22.png)
 
 <br></br>
 
@@ -524,80 +519,26 @@ SELECT * FROM public.h_mostpopular
 #### `Запрос`
 
 ```SQL
-CREATE OR REPLACE VIEW h_mostrisk_2grade AS
-SELECT *
-FROM hobby hb
-WHERE hb.id
-IN
-  (SELECT hb.id
-  FROM students st
-  INNER JOIN students_hobbies st_hb
-  ON st.id = st_hb.student_id
-  INNER JOIN hobby hb
-  ON st_hb.hobby_id = hb.id
-  WHERE LEFT(st.id::VARCHAR,1) = '2'
-  GROUP BY hb.id
-  ORDER BY COUNT(hb.id))
-ORDER BY hb.risk DESC
-LIMIT 1;
-
-SELECT * FROM public.h_mostrisk_2grade
+Аналоогично 22-му
 ```
-
-#### `Вывод`
-
-![exesize3_23](image/exe3_23.png)
 
 <br></br>
 
 ### <a name="3_24"></a> 24. Представление: для каждого курса подбирается количество студентов на курсе и количество отличников.
 
-#### `Запрос`
+#### `SQL запрос и Вывод`
 
-```SQL
-CREATE OR REPLACE VIEW st_idealscore_bygrade AS
-SELECT 
-  LEFT(st.n_group::VARCHAR,1) kours, 
-  COUNT(st.id) total, 
-  COUNT(st.id) FILTER (WHERE st.score >= 4.5) goodcount
-FROM students st
-GROUP BY LEFT(st.n_group::VARCHAR,1);
-
-SELECT * FROM public.st_idealscore_bygrade
-```
-
-#### `Вывод`
-
-![exesize3_24](image/exe3_24.png)
+![sql24](sql_pict/sql24.png)
 
 <br></br>
 
 ### <a name="3_25"></a> 25. Представление: самое популярное хобби среди всех студентов.
 
-#### `Запрос`
+#### `Запрос и Вывод`
 
-```SQL
-CREATE OR REPLACE VIEW h_popular AS
-SELECT *
-FROM hobby hb
-WHERE 
-  hb.id = 
-    (SELECT hb.id
-    FROM students st
-    INNER JOIN students_hobbies st_hb
-    ON st.id = st_hb.student_id
-    INNER JOIN hobby hb
-    ON st_hb.hobby_id = hb.id
-    GROUP BY hb.id
-    ORDER BY COUNT(hb.id) DESC
-    LIMIT 1);
-	
-SELECT * FROM public.h_popular
-```
+![sql25](sql_pict/sql25.png)
 
-#### `Вывод`
-
-![exesize3_25](image/exe3_25.png)
+###### ахахахах
 
 <br></br>
 
@@ -606,33 +547,35 @@ SELECT * FROM public.h_popular
 #### `Запрос`
 
 ```SQL
-CREATE OR REPLACE VIEW students_short AS
-SELECT st.id, st.name, st.surname, st.n_group
-FROM students st;
-SELECT * FROM public.students_short
+CREATE VIEW updatable as
+SELECT * FROM hobby;
+
+SELECT * FROM updatable;
 ```
 
 #### `Вывод`
 
-![exesize3_26](image/exe3_26.png)
+![sql26](sql_pict/sql26.png)
 
+###### В таких представлениях мы можем изменить или удалить строки или добавить в них новые строки.
 <br></br>
 
 ### <a name="3_27"></a> 27. Для каждой буквы алфавита из числа найденных величин, средних и балльных. (Т.е. среди всех студентов, чьё имя начинается на А (Алексей, Алина, Артур, Анджела) найти то, что указано в задании. Вывести на экран тех, средний балл проходит больше 3,6
 
 #### `Запрос`
 
+
+
+#### `SQL запрос и Вывод`
+
+![sql27](sql_pict/sql27.png)
+
+### Нужно добавить ещё 1 строчку
 ```SQL
-SELECT LEFT(st.name::VARCHAR,1) kours, MIN(st.score), MAX(st.score), ROUND(AVG(st.score),2) sred
-FROM students st
-GROUP BY LEFT(st.name::VARCHAR,1)
-HAVING MAX(st.score) > 3.6
+HAVINGmax(score)>3.6
 ```
-
-#### `Вывод`
-
-![exesize3_27](image/exe3_27.png)
-
+### И тогда улетят Pashka, Pushka and Pivo(имена на букву P)
+### Я просто тестил всякое тут
 <br></br>
 
 ### <a name="3_28"></a> 28. Для каждой фамилии характерна высокая степень тяжести и снижение балла. (Например, в университете учатся 4 Иванова (1-2-3-4). 1-2-3 учатся на 2 курсах и имеют средний балл 4.1, 4, 3.8, соответственно, а 4 Иванов учится на 3 курсах и имеет балл 4.5. На экране должно быть следующее:
@@ -644,20 +587,15 @@ HAVING MAX(st.score) > 3.6
 #### `Запрос`
 
 ```SQL
-SELECT 
-  LEFT(st.n_group::VARCHAR,1) kours, 
-  st.surname,
-  MIN(st.score),
-  MAX(st.score)
-FROM students st
-GROUP BY
-  LEFT(st.n_group::VARCHAR,1),
-  st.surname
+SELECT n_group/1000 as course, surname, max(score),min(score) 
+FROM student
+GROUP BY n_group/1000, surname
+
 ```
 
 #### `Вывод`
 
-![exesize3_28](image/exe3_28.png)
+![sql28](sql_pict/sql28.png)
 
 <br></br>
 
@@ -666,27 +604,33 @@ GROUP BY
 #### `Запрос`
 
 ```SQL
-SELECT EXTRACT(YEAR FROM st.date_birth) birth, COUNT(*) col_hobby
-FROM students st
-INNER JOIN students_hobbies st_hb
-ON st.id = st_hb.student_id
-GROUP BY EXTRACT(YEAR FROM st.date_birth)
+SELECT age, COUNT(distinct hobby_id)
+FROM student stud RIGHT JOIN student_hobby sh on stud.n_z = sh.student_id
+GROUP BY age
 ```
+### можно ещё через date_of_birth, но я только потом его добавил
+
 
 #### `Вывод`
 
-![exesize3_29](image/exe3_29.png)
+![sql29](sql_pict/sql29.png)
 
 <br></br>
 
-### <a name="3_30"></a> 30. Для каждой буквы алфавита в большинстве случаев возникает риск, связанный с хобби.
+### <a name="3_30"></a> 30. Для каждой буквы алфавита в имени найти максимальный и минимальный риск хобби.
 
 #### `Запрос`
 
 ```SQL
---непонял задание
+SELECT left(stud_tabl.name,1), min(risk), max(risk)
+FROM (student stud RIGHT JOIN student_hobby sh on stud.n_z = sh.student_id) as stud_tabl
+LEFT JOIN hobby h on h.id=stud_tabl.student_id
+GROUP BY left(stud_tabl.name,1)
+
 ```
 
 #### `Вывод`
+
+![sql30](sql_pict/sql30.png)
 
 <br></br>
