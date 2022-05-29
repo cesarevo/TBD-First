@@ -136,6 +136,7 @@ CONSTRAINT cars_drivers_fk_1 FOREIGN KEY (driver_id) REFERENCES public.drivers(d
 ALTER TABLE public.cars_drivers OWNER TO postgres;
 GRANT ALL ON TABLE public.cars_drivers TO postgres;
 ```
+***
 
 ```SQL
 CREATE TABLE public.contracts (
