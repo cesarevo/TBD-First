@@ -171,4 +171,4 @@ ALTER TABLE public.contracts OWNER TO postgres;
 GRANT ALL ON TABLE public.contracts TO postgres;
 ```
 # Итог:
-![sql_proj](project/sql_project.jpg)
+![sql_proj](sql_project.jpg)
