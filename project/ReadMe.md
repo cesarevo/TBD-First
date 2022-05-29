@@ -170,3 +170,5 @@ FOREIGN KEY (rate_id) REFERENCES public.rates(rate_id)
 ALTER TABLE public.contracts OWNER TO postgres;
 GRANT ALL ON TABLE public.contracts TO postgres;
 ```
+# Итог:
+![sql_proj](project/sql_proj.jpg)
