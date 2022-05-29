@@ -17,6 +17,7 @@ GRANT UPDATE ON имя_таблицы TO название_роли;
 
 ***
 
+###  начнём создавать инфраструктуру с таблицы типов машин
 ```SQL
 CREATE TABLE public.cars_type (
 cars_type_id serial NOT NULL,
@@ -33,6 +34,7 @@ GRANT ALL ON TABLE public.cars_type TO postgres;
 ```
 ***
 
+### Далее добавлю таблицу с категориями прав
 ```SQL
 CREATE TABLE public.categories (
 "Type" varchar NULL,
@@ -48,20 +50,10 @@ GRANT ALL ON TABLE public.categories TO postgres;
 ```
 ***
 
-```SQL
-CREATE TABLE public.clients (
-client_id serial NOT NULL,
-"name" varchar NOT NULL,
-CONSTRAINT clients_pk PRIMARY KEY (client_id)
-);
-```
-
-```SQL
-ALTER TABLE public.clients OWNER TO postgres;
-GRANT ALL ON TABLE public.clients TO postgres;
-```
-***
-
+### Таблица с машинами где перечислины их: 
+###### тип
+###### номер
+###### и тп
 ```SQL
 CREATE TABLE public.cars (
 car_id serial NOT NULL,
@@ -79,6 +71,7 @@ GRANT ALL ON TABLE public.cars TO postgres;
 ```
 ***
 
+### Таблица клиентов с их контактными данными
 ```SQL
 CREATE TABLE public.clients_contacts (
 client_id int NOT NULL,
@@ -94,7 +87,24 @@ GRANT ALL ON TABLE public.clients_contacts TO postgres;
 
 ```
 ***
+### Таблица клиентов
+```SQL
+CREATE TABLE public.clients (
+client_id serial NOT NULL,
+"name" varchar NOT NULL,
+CONSTRAINT clients_pk PRIMARY KEY (client_id)
+);
+```
 
+```SQL
+ALTER TABLE public.clients OWNER TO postgres;
+GRANT ALL ON TABLE public.clients TO postgres;
+```
+
+***
+
+### Таблица с водителями и их категориями прав
+###### Соеденина с таблицей categories по id
 ```SQL
 CREATE TABLE public.drivers (
 driver_id serial NOT NULL,
@@ -112,6 +122,7 @@ GRANT ALL ON TABLE public.drivers TO postgres;
 ```
 ***
 
+### Таблица с ценами различных машин
 ```SQL
 CREATE TABLE public.rates (
 rate_id serial NOT NULL,
@@ -128,7 +139,9 @@ GRANT ALL ON TABLE public.rates TO postgres;
 ```
 
 ***
-
+### Эта таблица ближе составная и стостоит из:
+###### cars
+###### drivers
 ```SQL
 CREATE TABLE public.cars_drivers (
 cars_drivers_id int NOT NULL,
@@ -139,13 +152,13 @@ CONSTRAINT cars_drivers_fk FOREIGN KEY (car_id) REFERENCES public.cars(car_id),
 CONSTRAINT cars_drivers_fk_1 FOREIGN KEY (driver_id) REFERENCES public.drivers(driver_id)
 );
 ```
-
 ```SQL
 ALTER TABLE public.cars_drivers OWNER TO postgres;
 GRANT ALL ON TABLE public.cars_drivers TO postgres;
 ```
 ***
 
+# самая главная таблица
 ```SQL
 CREATE TABLE public.contracts (
 contracts_id serial NOT NULL,
