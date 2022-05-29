@@ -15,7 +15,8 @@ GRANT UPDATE ON имя_таблицы TO название_роли;
 
 ### Для назначения права всем ролям в системе можно использовать специальное имя «роли»: PUBLIC. Также для упрощения управления ролями, когда в базе данных есть множество пользователей, можно настроить «групповые» роли
 
-<br> </br>
+***
+
 ```SQL
 CREATE TABLE public.cars_type (
 cars_type_id serial NOT NULL,
@@ -30,6 +31,7 @@ CONSTRAINT cars_type_pk PRIMARY KEY (cars_type_id)
 ALTER TABLE public.cars_type OWNER TO postgres;
 GRANT ALL ON TABLE public.cars_type TO postgres;
 ```
+***
 
 ```SQL
 CREATE TABLE public.categories (
@@ -44,6 +46,7 @@ CONSTRAINT categories_pk PRIMARY KEY (categorie_id)
 ALTER TABLE public.categories OWNER TO postgres;
 GRANT ALL ON TABLE public.categories TO postgres;
 ```
+***
 
 ```SQL
 CREATE TABLE public.clients (
@@ -57,6 +60,7 @@ CONSTRAINT clients_pk PRIMARY KEY (client_id)
 ALTER TABLE public.clients OWNER TO postgres;
 GRANT ALL ON TABLE public.clients TO postgres;
 ```
+***
 
 ```SQL
 CREATE TABLE public.cars (
@@ -73,7 +77,7 @@ CONSTRAINT cars_fk FOREIGN KEY (cars_type_id) REFERENCES public.cars_type(cars_t
 ALTER TABLE public.cars OWNER TO postgres;
 GRANT ALL ON TABLE public.cars TO postgres;
 ```
-
+***
 
 ```SQL
 CREATE TABLE public.clients_contacts (
@@ -89,6 +93,7 @@ ALTER TABLE public.clients_contacts OWNER TO postgres;
 GRANT ALL ON TABLE public.clients_contacts TO postgres;
 
 ```
+***
 
 ```SQL
 CREATE TABLE public.drivers (
@@ -105,6 +110,7 @@ CONSTRAINT drivers_fk FOREIGN KEY (categorie_id) REFERENCES public.categories(ca
 ALTER TABLE public.drivers OWNER TO postgres;
 GRANT ALL ON TABLE public.drivers TO postgres;
 ```
+***
 
 ```SQL
 CREATE TABLE public.rates (
@@ -120,6 +126,8 @@ CONSTRAINT rates_fk FOREIGN KEY (cars_type_id) REFERENCES public.cars_type(cars_
 ALTER TABLE public.rates OWNER TO postgres;
 GRANT ALL ON TABLE public.rates TO postgres;
 ```
+
+***
 
 ```SQL
 CREATE TABLE public.cars_drivers (
