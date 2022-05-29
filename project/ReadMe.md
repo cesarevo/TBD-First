@@ -12,7 +12,7 @@
 ###### https://www.postgresql.org/docs/current/ddl-constraints.html#DDL-CONSTRAINTS-FK
 ###### https://postgrespro.com/docs/postgresql/9.5/sql-altertable
 ###### https://postgrespro.ru/docs/postgresql/9.6/sql-grant?
-###### http://samoychiteli.ru/document29649.html#:~:text=%D0%A1%D0%B8%D0%BD%D1%82%D0%B0%D0%BA%D1%81%D0%B8%D1%81%3A%20%7C%20CREATE%20TYPE%20%D1%82%D0%B8%D0%BF,%5B%2C%20ELEMENT%20%3D%20%D1%8D%D0%BB%D0%B5%D0%BC%D0%B5%D0%BD%D1%82%5D%20%5B
+###### http://samoychiteli.ru/document29343.html
 
 
 # Немножко теории
