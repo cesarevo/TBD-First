@@ -1,9 +1,19 @@
 # Содержание
 
-+ [project](#project)
-+ [TZ](#TZ)
-+ [links](#links)
-+ [theory](#theory)
++ [Проект](#project)
++ [ТЗ](#TZ)
++ [Полезные ссылки](#links)
++ [Теория](#theory)
++ [Таблица cars_type](#cars_type)
++ [Таблица categories](#cat)
++ [Таблица cars](#cars)
++ [Таблица clients_contacts](#clients_contacts)
++ [Таблица drivers](#drivers)
++ [Таблица rates](#rates)
++ [Таблица cars_drivers](#cars_drivers)
++ [Таблица contracts](#contracts)
++ [Итог](#result)
+
 
 -----------------------------------------------------------
 # <a name="project"></a> Проект
@@ -41,8 +51,7 @@ GRANT UPDATE ON имя_таблицы TO название_роли;
 ### Для назначения права всем ролям в системе можно использовать специальное имя «роли»: PUBLIC. Также для упрощения управления ролями, когда в базе данных есть множество пользователей, можно настроить «групповые» роли
 
 ***
-
-###  начнём создавать инфраструктуру с таблицы типов машин
+### <a name = "cars_type"> </a>  Начнём создавать инфраструктуру с таблицы типов машин
 ```SQL
 CREATE TABLE public.cars_type (
 cars_type_id serial NOT NULL,
@@ -50,7 +59,6 @@ type_name varchar NOT NULL,
 CONSTRAINT cars_type_pk PRIMARY KEY (cars_type_id)
 );
 ```
-
 ### Назначаю нового владельца
 ### и даю права доступа
 ```SQl
@@ -58,8 +66,7 @@ ALTER TABLE public.cars_type OWNER TO postgres;
 GRANT ALL ON TABLE public.cars_type TO postgres;
 ```
 ***
-
-### Далее добавлю таблицу с категориями прав
+### <a name = "cat"> </a> Далее добавлю таблицу с категориями прав
 ```SQL
 CREATE TABLE public.categories (
 "Type" varchar NULL,
@@ -74,8 +81,7 @@ ALTER TABLE public.categories OWNER TO postgres;
 GRANT ALL ON TABLE public.categories TO postgres;
 ```
 ***
-
-### Таблица с машинами где перечислины их: 
+### <a name = "cars"> </a> Таблица с машинами где перечислины их: 
 ###### тип
 ###### номер
 ###### и тп
@@ -95,8 +101,7 @@ ALTER TABLE public.cars OWNER TO postgres;
 GRANT ALL ON TABLE public.cars TO postgres;
 ```
 ***
-
-### Таблица клиентов с их контактными данными
+### <a name = "clients_contacts"> </a> Таблица клиентов с их контактными данными
 ```SQL
 CREATE TABLE public.clients_contacts (
 client_id int NOT NULL,
@@ -112,7 +117,7 @@ GRANT ALL ON TABLE public.clients_contacts TO postgres;
 
 ```
 ***
-### Таблица клиентов
+### <a name = "clients"> </a> Таблица клиентов
 ```SQL
 CREATE TABLE public.clients (
 client_id serial NOT NULL,
@@ -127,8 +132,7 @@ GRANT ALL ON TABLE public.clients TO postgres;
 ```
 
 ***
-
-### Таблица с водителями и их категориями прав
+### <a name = "drivers"> </a> Таблица с водителями и их категориями прав
 ###### Соеденина с таблицей categories по id
 ```SQL
 CREATE TABLE public.drivers (
@@ -146,8 +150,7 @@ ALTER TABLE public.drivers OWNER TO postgres;
 GRANT ALL ON TABLE public.drivers TO postgres;
 ```
 ***
-
-### Таблица с ценами различных машин
+### <a name = "rates"> </a> Таблица с ценами различных машин
 ```SQL
 CREATE TABLE public.rates (
 rate_id serial NOT NULL,
@@ -164,7 +167,7 @@ GRANT ALL ON TABLE public.rates TO postgres;
 ```
 
 ***
-### Эта таблица ближе составная и стостоит из:
+### <a name = "cars_drivers"> </a> Эта таблица ближе составная и стостоит из:
 ######  таблицы cars
 ######  таблицы drivers
 ```SQL
@@ -182,8 +185,7 @@ ALTER TABLE public.cars_drivers OWNER TO postgres;
 GRANT ALL ON TABLE public.cars_drivers TO postgres;
 ```
 ***
-
-# самая главная таблица
+### <a name = "contracts"> </a> самая главная таблица
 ```SQL
 CREATE TABLE public.contracts (
 contracts_id serial NOT NULL,
@@ -208,5 +210,8 @@ FOREIGN KEY (rate_id) REFERENCES public.rates(rate_id)
 ALTER TABLE public.contracts OWNER TO postgres;
 GRANT ALL ON TABLE public.contracts TO postgres;
 ```
-# Итог:
+
+***
+
+# <a name = "result"> </a> Итог:
 ![sql_proj](sql_project.jpg)
