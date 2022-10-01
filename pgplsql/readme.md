@@ -217,8 +217,10 @@ begin
 	return 0;
 end
 $$ language plpgsql;
-'''
 
+select luke_skywalker(5);
+'''
+<br></br>
 
 ### <a name="3_8"></a> 8. Напишите функцию, которая возвращает количество человек родившихся в заданном году.
 
