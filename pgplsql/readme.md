@@ -37,7 +37,6 @@ SELECT smth();
 ### <a name="3_2"></a> 2. Выведите на экран текущую дату.
 
 #### `Запрос`
-
 ```SQL
 create or replace function date_today() returns varchar
 as $$
@@ -47,6 +46,137 @@ end
 $$ language plpgsql;
 
 select date_today();
+```
 
+<br></br>
+
+### <a name="3_3"></a> 3. Создайте две числовые переменные и присвойте им значение. Выполните математические действия с этими числами и выведите результат на экран.
+
+#### `Запрос`
+
+```SQL
+create or replace function math(x int, y int, OUT sum int, OUT multi int, OUT sub int, OUT div float) 
+as $$
+begin
+    sum = x + y;
+    multi = x * y;
+    sub = x - y;
+    div = x/y;
+	
+end;
+$$ language plpgsql;
+
+select * from math(10,10);
+```
+
+<br></br>
+
+### <a name="3_4"></a> 4. Написать программу двумя способами 1 - использование IF, 2 - использование CASE. Объявите числовую переменную и присвоейте ей значение. Если число равно 5 - выведите на экран "Отлично". 4 - "Хорошо". 3 - Удовлетворительно". 2 - "Неуд". В остальных случаях выведите на экран сообщение, что введённая оценка не верна.
+
+#### `Запрос через if`
+
+```SQL
+create or replace function with_if(mark_facebook int) returns varchar
+as $$
+begin
+	if mark_facebook = 5 then return 'Отлично';
+	elsif mark_facebook = 4 then return 'Хорошо';
+	elsif mark_facebook = 3 then return 'Удовлетворительно';
+	elsif mark_facebook = 2 then return 'Неуд';
+	else return 'введённая оценка не верна';
+	end if;
+	
+end
+$$ language plpgsql;
+
+select with_if(1);
+```
+
+#### `Запрос через case'
+'''SQL
+create or replace function with_case(mark_facebook int) returns varchar
+as $$
+begin
+	case
+		when mark_facebook = 5 then return 'Отлично';
+		when mark_facebook = 4 then return 'Хорошо';
+		when mark_facebook = 3 then return 'Удовлетворительно';
+		when mark_facebook = 2 then return 'Неуд';
+		else return 'введённая оценка не верна';
+	end case;
+end
+$$ language plpgsql;
+
+select with_case(2);
+'''
+
+### <a name="3_5"></a> 5. Выведите все квадраты чисел от 20 до 30 3-мя разными способами (LOOP, WHILE, FOR).
+
+#### 'loop'
+
+```SQL
+
+create or replace procedure pow_numbers()
+language plpgsql
+as $$
+declare i int = 20;
+begin
+	loop
+		exit when i > 30;
+		raise notice 'number: %',i*i;
+		i = i + 1;
+	end loop;
+end;
+$$;
+'''
+#### 'while'
+'''SQL
+do $$
+declare 
+	i int := 20;
+begin
+	while i <= 30 loop
+		raise notice 'number: %',i*i;
+		i = i + 1;
+	end loop;
+end;
+$$;
+'''
+
+#### 'for'
+'''SQL
+
+do $$
+begin
+	for i in 20..30 loop
+		raise notice 'number: %',i*i;
+	end loop;
+end;
+$$;
 
 ```
+
+
+### <a name="3_6"></a> 6.Задания: написать функцию, входной параметр - начальное число, на выходе - количество чисел, пока не получим 1; написать процедуру, которая выводит все числа последовательности. Входной параметр - начальное число.
+
+#### `Запрос`
+
+```SQL
+create or replace function collatz(x int) returns int
+as $$
+begin
+	while x!=1 loop
+		case 
+			when x%2=0 then x = x/2;
+			else x = x*3+1;
+		end case;
+	end loop;
+	return x;
+		
+end
+$$ language plpgsql;
+
+select collatz(3);
+```
+
+<br></br>
