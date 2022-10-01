@@ -129,9 +129,10 @@ begin
 	end loop;
 end;
 $$;
-'''
+```
+<br></br>
 #### 'while'
-'''SQL
+```SQL
 do $$
 declare 
 	i int := 20;
@@ -142,10 +143,10 @@ begin
 	end loop;
 end;
 $$;
-'''
-
+```
+<br></br>
 #### 'for'
-'''SQL
+```SQL
 
 do $$
 begin
@@ -178,10 +179,10 @@ end
 $$ language plpgsql;
 
 select collatz(3);
-'''
+```
 
 #### 'procedure'
-'''SQL
+```SQL
 CREATE OR REPLACE PROCEDURE collatz_procedure(INOUT x int)
 LANGUAGE plpgsql
 AS $$
