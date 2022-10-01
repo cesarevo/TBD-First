@@ -93,7 +93,8 @@ select with_if(1);
 ```
 
 #### `Запрос через case'
-'''SQL
+
+```SQL
 create or replace function with_case(mark_facebook int) returns varchar
 as $$
 begin
@@ -108,7 +109,7 @@ end
 $$ language plpgsql;
 
 select with_case(2);
-'''
+```
 
 ### <a name="3_5"></a> 5. Выведите все квадраты чисел от 20 до 30 3-мя разными способами (LOOP, WHILE, FOR).
 
