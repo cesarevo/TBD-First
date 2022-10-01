@@ -223,22 +223,9 @@ select luke_skywalker(5);
 #### 'я не очень понял как здесь вывести всю последовательность чисел в числах Люка'
 <br></br>
 
-### <a name="3_8"></a> 8. Выведите на экран любое сообщение.
+### <a name="3_8"></a> 8. Напишите функцию, которая возвращает количество человек родившихся в заданном году.
 
 #### `Запрос`
-
-```SQL
-CREATE OR REPLACE FUNCTION smth() returns varchar
-AS $$
-BEGIN 
-	return 'рус en';
-END
-$$ language plpgsql;
-
-SELECT smth();
-```
-
-<br></br>
 
 ```SQL
 create or replace function peoples_birth(year int) returns int
