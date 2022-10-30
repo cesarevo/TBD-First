@@ -393,7 +393,7 @@ commit;
 ### <a name="3_15"></a> 15. Напишите процедуру, которая позволяет актуализировать рост и вес человека.
 
 #### `Запрос`
-
+ 
 ```SQL
 create or replace procedure GrowthAndWeight(person_id int, newGrowth real, newWeight real)
 as $$
