@@ -10,9 +10,13 @@
 6. [Последовательность Коллатца. Берётся любое натуральное число. Если чётное - делим его на 2, если нечётное, то умножаем его на 3 и прибавляем 1. Такие действия выполняются до тех пор, пока не будет получена единица. Гипотеза заключается в том, что какое бы начальное число n не было выбрано, всегда получится 1 на каком-то шаге. Задания: написать функцию, входной параметр - начальное число, на выходе - количество чисел, пока не получим 1; написать процедуру, которая выводит все числа последовательности. Входной параметр - начальное число.](#3_6)
 7. [Числа Люка. Объявляем и присваиваем значение переменной - количество числе Люка. Вывести на экран последовательность чисел. Где L0 = 2, L1 = 1 ; Ln=Ln-1 + Ln-2 (сумма двух предыдущих чисел). Задания: написать фунцию, входной параметр - количество чисел, на выходе - последнее число (Например: входной 5, 2 1 3 4 7 - на выходе число 7); написать процедуру, которая выводит все числа последовательности. Входной параметр - количество чисел.](#3_7)
 8. [Напишите функцию, которая возвращает количество человек родившихся в заданном году.](#3_8)
-9. [Напишите функцию, которая возвращает количество человек родившихся в заданном году.](#3_9)
-10. [Напишите функцию, которая возвращает количество человек с заданным цветом глаз.](#3_10)
-11. [Напишите функцию, которая возвращает ID самого молодого человека в таблице.](#3_11)
+10. [Напишите функцию, которая возвращает количество человек с заданным цветом глаз.](#3_9)
+11. [Напишите функцию, которая возвращает ID самого молодого человека в таблице.](#3_10)
+12. [Напишите процедуру, которая возвращает людей с индексом массы тела больше заданного. ИМТ.](#3_11)
+13. [Измените схему БД так, чтобы в БД можно было хранить родственные связи между людьми.](#3_12)
+14. [Напишите процедуру, которая позволяет создать в БД нового человека с указанным родством.](#3_13)
+15. [Измените схему БД так, чтобы в БД можно было хранить время актуальности данных человека.](#3_14)
+16. [Напишите процедуру, которая позволяет актуализировать рост и вес человека.](#3_15)
 
 
 <br></br>
@@ -293,5 +297,118 @@ select * from id_return();
 
 <br></br>
 
-#### 'Дальше я не смог сделать, потому что там используется курсор как я понял '
-#### 'но 12-15 вроде не сложно, но с реализацией у меня проблемы'
+
+<br></br>
+
+### <a name="3_11"></a> 11. Напишите процедуру, которая возвращает людей с индексом массы тела больше заданного.
+
+#### `Запрос`
+
+```SQL
+create or replace procedure IMT(imt int)
+as $$
+declare
+	pRT people%rowtype;
+begin
+	for pRT in select * from people
+	loop
+		if pRT.weight / (pRT.growth/100)^2 > imt
+		then raise notice 'id: %, name: %, surname: %', pRT.id, pRT.name, pRT.surname;
+		end if;
+	end loop;
+end
+$$ language plpgsql;
+
+call IMT(0);
+```
+
+<br></br>
+
+
+
+<br></br>
+
+### <a name="3_12"></a> 12. Измените схему БД так, чтобы в БД можно было хранить родственные связи между людьми.
+
+#### `Запрос`
+
+```SQL
+create table parent_child(
+people_id int references people(id),
+child_id int references people(id)
+);
+
+insert into parent_child (people_id, child_id)
+values (1, 3), (2, 3),(2, 6),(4, 5);
+```
+<br></br>
+
+<br></br>
+
+### <a name="3_13"></a> 13. Напишите процедуру, которая позволяет создать в БД нового человека с указанным родством.
+
+#### `Запрос`
+
+```SQL
+create or replace procedure AddPeople(name varchar, surname varchar, birth_date date,
+				      growth real, weight real, eyes varchar, hair varchar,
+				      child_id int, parent1_id int, parent2_id int)
+as $$
+declare
+	person_id int;
+begin
+	insert into people (name, surname, birth_date, growth, weight, eyes, hair)
+		values (name, surname, birth_date, growth, weight, eyes, hair) returning id into person_id;
+	insert into parent_child (people_id, child_id)
+		values (person_id, child_id);
+	insert into parent_child (people_id, child_id)
+		values (parent1_id, person_id);
+	insert into parent_child (people_id, child_id)
+		values (parent2_id, person_id);
+end
+$$ language plpgsql;
+
+call AddPeople('Aleksey', 'Korshunov', '07.05.2002', 178, 81.2, 'green', 'black', 5, 3, 4)
+```
+<br></br>
+
+
+<br></br>
+
+### <a name="3_14"></a> 14. Измените схему БД так, чтобы в БД можно было хранить время актуальности данных человека
+
+#### `Запрос`
+
+```SQL
+begin;
+	alter table people
+	add time_of_relevance timestamp not null default now();
+commit;
+
+```
+<br></br>
+
+<br></br>
+
+### <a name="3_15"></a> 15. Напишите процедуру, которая позволяет актуализировать рост и вес человека.
+
+#### `Запрос`
+
+```SQL
+create or replace procedure GrowthAndWeight(person_id int, newGrowth real, newWeight real)
+as $$
+begin
+	update people
+	set growth = newGrowth, weight = newWeight, actual_time = now()
+	where people.id = person_id;
+end
+$$ language plpgsql;
+
+call GrowthAndWeight(7, 180, 81);
+
+```
+<br></br>
+
+
+
+
