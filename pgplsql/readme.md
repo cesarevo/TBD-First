@@ -339,7 +339,7 @@ child_id int references people(id)
 );
 
 insert into parent_child (people_id, child_id)
-values (1, 3), (2, 3),(2, 6),(4, 5);
+values (1, 3), (2, 3), (2, 6), (4, 5);
 ```
 <br></br>
 
